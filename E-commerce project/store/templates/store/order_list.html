@@ -1,0 +1,219 @@
+{% extends 'store/base.html' %}
+
+{% block title %}My Orders - ShopHub{% endblock %}
+
+{% block content %}
+<style>
+    .orders-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+    
+    .orders-header h1 {
+        font-size: 2.5rem;
+        color: #333;
+        margin-bottom: 0.5rem;
+    }
+    
+    .orders-container {
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+    
+    .order-card {
+        background: white;
+        padding: 2rem;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        margin-bottom: 2rem;
+        transition: all 0.3s ease;
+    }
+    
+    .order-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    }
+    
+    .order-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid #e0e0e0;
+    }
+    
+    .order-number {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #333;
+    }
+    
+    .order-status {
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+    
+    .status-pending {
+        background: #fff3cd;
+        color: #856404;
+    }
+    
+    .status-processing {
+        background: #cfe2ff;
+        color: #084298;
+    }
+    
+    .status-shipped {
+        background: #d1ecf1;
+        color: #0c5460;
+    }
+    
+    .status-delivered {
+        background: #d4edda;
+        color: #155724;
+    }
+    
+    .status-cancelled {
+        background: #f8d7da;
+        color: #721c24;
+    }
+    
+    .order-info {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .info-item {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .info-label {
+        font-size: 0.9rem;
+        color: #666;
+        margin-bottom: 0.3rem;
+    }
+    
+    .info-value {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #333;
+    }
+    
+    .order-total {
+        font-size: 1.3rem;
+        color: #28a745;
+        font-weight: bold;
+    }
+    
+    .btn-view-details {
+        display: inline-block;
+        padding: 0.8rem 2rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        text-decoration: none;
+        border-radius: 25px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-view-details:hover {
+        transform: scale(1.05);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+    
+    .no-orders {
+        text-align: center;
+        padding: 5rem 2rem;
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+    }
+    
+    .no-orders-icon {
+        font-size: 5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .no-orders h2 {
+        font-size: 2rem;
+        color: #666;
+        margin-bottom: 1rem;
+    }
+    
+    .no-orders p {
+        color: #999;
+        font-size: 1.1rem;
+        margin-bottom: 2rem;
+    }
+    
+    .btn-shop {
+        display: inline-block;
+        padding: 1rem 2.5rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        text-decoration: none;
+        border-radius: 30px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-shop:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+    }
+</style>
+
+<div class="orders-header">
+    <h1>📦 My Orders</h1>
+    <p style="color: #666; font-size: 1.1rem;">Track and manage your orders</p>
+</div>
+
+<div class="orders-container">
+    {% if orders %}
+        {% for order in orders %}
+        <div class="order-card">
+            <div class="order-header">
+                <span class="order-number">Order #{{ order.id }}</span>
+                <span class="order-status status-{{ order.status }}">
+                    {{ order.get_status_display }}
+                </span>
+            </div>
+            
+            <div class="order-info">
+                <div class="info-item">
+                    <span class="info-label">📅 Order Date</span>
+                    <span class="info-value">{{ order.order_date|date:"M d, Y" }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">🕐 Time</span>
+                    <span class="info-value">{{ order.order_date|date:"H:i" }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">📦 Items</span>
+                    <span class="info-value">{{ order.items.count }} item{{ order.items.count|pluralize }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">💰 Total</span>
+                    <span class="info-value order-total">${{ order.total_amount }}</span>
+                </div>
+            </div>
+            
+            <a href="{% url 'order_detail' order.id %}" class="btn-view-details">View Details →</a>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="no-orders">
+            <div class="no-orders-icon">📦</div>
+            <h2>No orders yet</h2>
+            <p>You haven't placed any orders. Start shopping to see your orders here!</p>
+            <a href="{% url 'product_list' %}" class="btn-shop">Start Shopping</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

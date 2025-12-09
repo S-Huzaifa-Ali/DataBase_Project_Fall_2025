@@ -1,0 +1,305 @@
+{% extends 'store/base.html' %}
+
+{% block title %}{{ product.name }} - ShopHub{% endblock %}
+
+{% block content %}
+<style>
+    .product-detail-container {
+        background: white;
+        border-radius: 20px;
+        padding: 3rem;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        margin-bottom: 3rem;
+    }
+    
+    .product-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 3rem;
+        margin-bottom: 3rem;
+    }
+    
+    .product-image-section {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        border-radius: 15px;
+        padding: 3rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 8rem;
+        min-height: 400px;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .product-image-section::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+        animation: rotate 20s linear infinite;
+    }
+    
+    @keyframes rotate {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+    
+    .product-info-section h1 {
+        font-size: 2.5rem;
+        color: #333;
+        margin-bottom: 1rem;
+    }
+    
+    .product-price {
+        font-size: 2.5rem;
+        color: #28a745;
+        font-weight: bold;
+        margin: 1.5rem 0;
+    }
+    
+    .product-meta {
+        display: flex;
+        gap: 2rem;
+        margin: 1.5rem 0;
+        padding: 1.5rem;
+        background: #f8f9fa;
+        border-radius: 10px;
+    }
+    
+    .meta-item {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .meta-label {
+        font-size: 0.9rem;
+        color: #666;
+        margin-bottom: 0.3rem;
+    }
+    
+    .meta-value {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #333;
+    }
+    
+    .product-description {
+        font-size: 1.1rem;
+        line-height: 1.8;
+        color: #555;
+        margin: 2rem 0;
+    }
+    
+    .btn-add-cart {
+        display: inline-block;
+        padding: 1.2rem 3rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        text-decoration: none;
+        border-radius: 30px;
+        font-size: 1.2rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+        margin-top: 1rem;
+    }
+    
+    .btn-add-cart:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+    }
+    
+    .btn-add-cart:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+        transform: none;
+    }
+    
+    .stock-status {
+        display: inline-block;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+    
+    .stock-status.in-stock {
+        background: #d4edda;
+        color: #155724;
+    }
+    
+    .stock-status.low-stock {
+        background: #fff3cd;
+        color: #856404;
+    }
+    
+    .stock-status.out-of-stock {
+        background: #f8d7da;
+        color: #721c24;
+    }
+    
+    .login-prompt {
+        background: #d1ecf1;
+        color: #0c5460;
+        padding: 1.5rem;
+        border-radius: 10px;
+        margin-top: 1rem;
+        border-left: 4px solid #17a2b8;
+    }
+    
+    .login-prompt a {
+        color: #0c5460;
+        font-weight: 600;
+        text-decoration: underline;
+    }
+    
+    .reviews-section {
+        background: white;
+        border-radius: 20px;
+        padding: 3rem;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+    }
+    
+    .reviews-section h2 {
+        font-size: 2rem;
+        color: #333;
+        margin-bottom: 2rem;
+    }
+    
+    .review-card {
+        background: #f8f9fa;
+        padding: 1.5rem;
+        border-radius: 15px;
+        margin-bottom: 1.5rem;
+        border-left: 4px solid #667eea;
+    }
+    
+    .review-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+    
+    .review-author {
+        font-weight: 600;
+        color: #333;
+        font-size: 1.1rem;
+    }
+    
+    .review-rating {
+        color: #ffc107;
+        font-size: 1.2rem;
+    }
+    
+    .review-comment {
+        color: #555;
+        line-height: 1.6;
+        margin-bottom: 0.5rem;
+    }
+    
+    .review-date {
+        color: #999;
+        font-size: 0.9rem;
+    }
+    
+    .no-reviews {
+        text-align: center;
+        padding: 3rem;
+        color: #999;
+    }
+    
+    @media (max-width: 768px) {
+        .product-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .product-detail-container {
+            padding: 1.5rem;
+        }
+    }
+</style>
+
+<div class="product-detail-container">
+    <div class="product-grid">
+        <div class="product-image-section" {% if product.image %}style="background-image: url('{{ product.image.url }}'); background-size: cover; background-position: center; font-size: 0;"{% endif %}>
+            {% if not product.image %}
+                {% if 'Laptop' in product.name or 'Smartphone' in product.name or 'Headphones' in product.name %}💻
+                {% elif 'Shirt' in product.name or 'Jeans' in product.name %}👔
+                {% elif 'Book' in product.name or 'Programming' in product.name or 'Novel' in product.name %}📖
+                {% elif 'Garden' in product.name or 'Tools' in product.name %}🌿
+                {% elif 'Basketball' in product.name or 'Yoga' in product.name or 'Mat' in product.name %}🏀
+                {% else %}🎁{% endif %}
+            {% endif %}
+        </div>
+        
+        <div class="product-info-section">
+            <h1>{{ product.name }}</h1>
+            
+            <div class="product-price">${{ product.price }}</div>
+            
+            <div class="product-meta">
+                <div class="meta-item">
+                    <span class="meta-label">Category</span>
+                    <span class="meta-value">{{ product.category.name }}</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Availability</span>
+                    {% if product.stock_quantity > 20 %}
+                        <span class="stock-status in-stock">✓ In Stock</span>
+                    {% elif product.stock_quantity > 0 %}
+                        <span class="stock-status low-stock">⚠ Low Stock ({{ product.stock_quantity }} left)</span>
+                    {% else %}
+                        <span class="stock-status out-of-stock">✗ Out of Stock</span>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <p class="product-description">{{ product.description }}</p>
+            
+            {% if user.is_authenticated %}
+                {% if product.stock_quantity > 0 %}
+                    <a href="{% url 'add_to_cart' product.id %}" class="btn-add-cart">
+                        🛒 Add to Cart
+                    </a>
+                {% else %}
+                    <button class="btn-add-cart" disabled>Out of Stock</button>
+                {% endif %}
+            {% else %}
+                <div class="login-prompt">
+                    <strong>🔐 Login Required</strong><br>
+                    Please <a href="{% url 'login' %}?next={{ request.path }}">login</a> or 
+                    <a href="{% url 'signup' %}">create an account</a> to add items to your cart.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="reviews-section">
+    <h2>⭐ Customer Reviews</h2>
+    {% for review in reviews %}
+    <div class="review-card">
+        <div class="review-header">
+            <span class="review-author">👤 {{ review.customer.user.username }}</span>
+            <span class="review-rating">
+                {% for i in "12345" %}
+                    {% if forloop.counter <= review.rating %}⭐{% else %}☆{% endif %}
+                {% endfor %}
+            </span>
+        </div>
+        <p class="review-comment">{{ review.comment }}</p>
+        <p class="review-date">{{ review.created_at|date:"F d, Y" }}</p>
+    </div>
+    {% empty %}
+    <div class="no-reviews">
+        <p>No reviews yet. Be the first to review this product!</p>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

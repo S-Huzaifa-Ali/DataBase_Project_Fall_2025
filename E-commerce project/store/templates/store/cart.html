@@ -1,0 +1,293 @@
+{% extends 'store/base.html' %}
+
+{% block title %}Shopping Cart - ShopHub{% endblock %}
+
+{% block content %}
+<style>
+    .cart-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+    
+    .cart-header h1 {
+        font-size: 2.5rem;
+        color: #333;
+        margin-bottom: 0.5rem;
+    }
+    
+    .cart-container {
+        background: white;
+        border-radius: 20px;
+        padding: 3rem;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+    }
+    
+    .cart-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 2rem 0;
+    }
+    
+    .cart-table thead {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+    
+    .cart-table th {
+        padding: 1.2rem;
+        text-align: left;
+        font-weight: 600;
+    }
+    
+    .cart-table th:last-child,
+    .cart-table td:last-child {
+        text-align: right;
+    }
+    
+    .cart-table tbody tr {
+        border-bottom: 1px solid #e0e0e0;
+        transition: background 0.3s ease;
+    }
+    
+    .cart-table tbody tr:hover {
+        background: #f8f9fa;
+    }
+    
+    .cart-table td {
+        padding: 1.5rem 1.2rem;
+    }
+    
+    .product-info {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+    
+    .product-icon {
+        font-size: 2.5rem;
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        width: 60px;
+        height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 10px;
+    }
+    
+    .product-name {
+        font-weight: 600;
+        color: #333;
+        text-decoration: none;
+        transition: color 0.3s ease;
+    }
+    
+    .product-name:hover {
+        color: #667eea;
+    }
+    
+    .quantity-badge {
+        background: #667eea;
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-weight: 600;
+    }
+    
+    .price {
+        font-size: 1.1rem;
+        color: #28a745;
+        font-weight: 600;
+    }
+    
+    .subtotal {
+        font-size: 1.2rem;
+        color: #333;
+        font-weight: bold;
+    }
+    
+    .cart-footer {
+        background: #f8f9fa;
+        padding: 2rem;
+        border-radius: 15px;
+        margin-top: 2rem;
+    }
+    
+    .total-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 1.8rem;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 2rem;
+    }
+    
+    .total-amount {
+        color: #28a745;
+    }
+    
+    .cart-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: flex-end;
+    }
+    
+    .btn-continue {
+        padding: 1rem 2rem;
+        background: #6c757d;
+        color: white;
+        text-decoration: none;
+        border-radius: 30px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-continue:hover {
+        background: #5a6268;
+        transform: translateY(-2px);
+    }
+    
+    .btn-checkout {
+        padding: 1rem 2.5rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 30px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-checkout:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+    }
+    
+    .empty-cart {
+        text-align: center;
+        padding: 5rem 2rem;
+    }
+    
+    .empty-cart-icon {
+        font-size: 5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .empty-cart h2 {
+        font-size: 2rem;
+        color: #666;
+        margin-bottom: 1rem;
+    }
+    
+    .empty-cart p {
+        color: #999;
+        font-size: 1.1rem;
+        margin-bottom: 2rem;
+    }
+    
+    .btn-shop {
+        display: inline-block;
+        padding: 1rem 2.5rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        text-decoration: none;
+        border-radius: 30px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-shop:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+    }
+    
+    @media (max-width: 768px) {
+        .cart-container {
+            padding: 1.5rem;
+        }
+        
+        .cart-table {
+            font-size: 0.9rem;
+        }
+        
+        .product-icon {
+            width: 40px;
+            height: 40px;
+            font-size: 1.5rem;
+        }
+        
+        .cart-actions {
+            flex-direction: column;
+        }
+    }
+</style>
+
+<div class="cart-header">
+    <h1>🛒 Your Shopping Cart</h1>
+</div>
+
+<div class="cart-container">
+    {% if cart_items %}
+    <table class="cart-table">
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th style="text-align: center;">Quantity</th>
+                <th style="text-align: right;">Price</th>
+                <th style="text-align: right;">Subtotal</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in cart_items %}
+            <tr>
+                <td>
+                    <div class="product-info">
+                        <div class="product-icon">
+                            {% if 'Laptop' in item.product.name or 'Smartphone' in item.product.name or 'Headphones' in item.product.name %}💻
+                            {% elif 'Shirt' in item.product.name or 'Jeans' in item.product.name %}👔
+                            {% elif 'Book' in item.product.name or 'Programming' in item.product.name or 'Novel' in item.product.name %}📖
+                            {% elif 'Garden' in item.product.name or 'Tools' in item.product.name %}🌿
+                            {% elif 'Basketball' in item.product.name or 'Yoga' in item.product.name or 'Mat' in item.product.name %}🏀
+                            {% else %}🎁{% endif %}
+                        </div>
+                        <a href="{% url 'product_detail' item.product.id %}" class="product-name">
+                            {{ item.product.name }}
+                        </a>
+                    </div>
+                </td>
+                <td style="text-align: center;">
+                    <span class="quantity-badge">{{ item.quantity }}</span>
+                </td>
+                <td style="text-align: right;">
+                    <span class="price">${{ item.product.price }}</span>
+                </td>
+                <td style="text-align: right;">
+                    <span class="subtotal">${{ item.get_subtotal }}</span>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    <div class="cart-footer">
+        <div class="total-row">
+            <span>Total:</span>
+            <span class="total-amount">${{ total }}</span>
+        </div>
+        
+        <div class="cart-actions">
+            <a href="{% url 'product_list' %}" class="btn-continue">← Continue Shopping</a>
+            <a href="{% url 'checkout' %}" class="btn-checkout" style="text-decoration: none; display: inline-block;">Proceed to Checkout →</a>
+        </div>
+    </div>
+    {% else %}
+    <div class="empty-cart">
+        <div class="empty-cart-icon">🛒</div>
+        <h2>Your cart is empty</h2>
+        <p>Looks like you haven't added anything to your cart yet.</p>
+        <a href="{% url 'product_list' %}" class="btn-shop">Start Shopping</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

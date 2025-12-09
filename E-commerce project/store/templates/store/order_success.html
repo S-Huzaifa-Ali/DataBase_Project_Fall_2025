@@ -1,0 +1,153 @@
+{% extends 'store/base.html' %}
+
+{% block title %}Order Placed - ShopHub{% endblock %}
+
+{% block content %}
+<style>
+    .success-container {
+        max-width: 800px;
+        margin: 3rem auto;
+        text-align: center;
+    }
+    
+    .success-card {
+        background: white;
+        padding: 4rem 3rem;
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+    }
+    
+    .success-icon {
+        font-size: 5rem;
+        margin-bottom: 1rem;
+        animation: bounce 1s ease;
+    }
+    
+    @keyframes bounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-20px); }
+    }
+    
+    .success-card h1 {
+        font-size: 2.5rem;
+        color: #28a745;
+        margin-bottom: 1rem;
+    }
+    
+    .success-card p {
+        font-size: 1.2rem;
+        color: #666;
+        margin-bottom: 2rem;
+        line-height: 1.6;
+    }
+    
+    .order-info {
+        background: #f8f9fa;
+        padding: 2rem;
+        border-radius: 15px;
+        margin: 2rem 0;
+    }
+    
+    .order-info h2 {
+        font-size: 1.5rem;
+        color: #333;
+        margin-bottom: 1rem;
+    }
+    
+    .info-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.8rem 0;
+        border-bottom: 1px solid #e0e0e0;
+    }
+    
+    .info-row:last-child {
+        border-bottom: none;
+    }
+    
+    .info-label {
+        font-weight: 600;
+        color: #666;
+    }
+    
+    .info-value {
+        color: #333;
+    }
+    
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        margin-top: 2rem;
+    }
+    
+    .btn {
+        padding: 1rem 2rem;
+        border-radius: 30px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+    }
+    
+    .btn-secondary {
+        background: #6c757d;
+        color: white;
+    }
+    
+    .btn-secondary:hover {
+        background: #5a6268;
+        transform: translateY(-2px);
+    }
+</style>
+
+<div class="success-container">
+    <div class="success-card">
+        <div class="success-icon">🎉</div>
+        <h1>Order Placed Successfully!</h1>
+        <p>Thank you for your order. We've received your order and will process it shortly.</p>
+        
+        <div class="order-info">
+            <h2>Order Details</h2>
+            <div class="info-row">
+                <span class="info-label">Order Number:</span>
+                <span class="info-value">#{{ order.id }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Order Date:</span>
+                <span class="info-value">{{ order.order_date|date:"F d, Y H:i" }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Total Amount:</span>
+                <span class="info-value" style="color: #28a745; font-weight: bold;">${{ order.total_amount }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Payment Method:</span>
+                <span class="info-value">{{ order.payment.get_payment_method_display }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Status:</span>
+                <span class="info-value" style="color: #ffc107; font-weight: bold;">{{ order.get_status_display }}</span>
+            </div>
+        </div>
+        
+        <p style="font-size: 1rem; color: #999;">
+            A confirmation email has been sent to {{ user.email }}
+        </p>
+        
+        <div class="action-buttons">
+            <a href="{% url 'order_detail' order.id %}" class="btn btn-primary">View Order Details</a>
+            <a href="{% url 'product_list' %}" class="btn btn-secondary">Continue Shopping</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,269 @@
+{% extends 'store/base.html' %}
+
+{% block title %}Shop - ShopHub{% endblock %}
+
+{% block content %}
+<style>
+    .shop-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+    
+    .shop-header h1 {
+        font-size: 2.5rem;
+        color: #333;
+        margin-bottom: 0.5rem;
+    }
+    
+    .search-section {
+        background: white;
+        padding: 2rem;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        margin-bottom: 2rem;
+    }
+    
+    .search-form {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+    
+    .search-input {
+        flex: 1;
+        min-width: 250px;
+        padding: 0.8rem 1.2rem;
+        border: 2px solid #e0e0e0;
+        border-radius: 25px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+    
+    .search-input:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    
+    .category-select {
+        padding: 0.8rem 1.2rem;
+        border: 2px solid #e0e0e0;
+        border-radius: 25px;
+        font-size: 1rem;
+        background: white;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        min-width: 200px;
+    }
+    
+    .category-select:focus {
+        outline: none;
+        border-color: #667eea;
+    }
+    
+    .search-btn {
+        padding: 0.8rem 2rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 25px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .search-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+    
+    .products-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 2rem;
+        margin-top: 2rem;
+    }
+    
+    .product-card {
+        background: white;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+        position: relative;
+    }
+    
+    .product-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    }
+    
+    .product-image {
+        width: 100%;
+        height: 200px;
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 4rem;
+        position: relative;
+    }
+    
+    .stock-badge {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: rgba(255,255,255,0.9);
+        padding: 0.3rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+    
+    .stock-badge.in-stock {
+        color: #28a745;
+    }
+    
+    .stock-badge.low-stock {
+        color: #ffc107;
+    }
+    
+    .stock-badge.out-of-stock {
+        color: #dc3545;
+    }
+    
+    .product-content {
+        padding: 1.5rem;
+    }
+    
+    .product-content h3 {
+        font-size: 1.3rem;
+        margin-bottom: 0.5rem;
+        color: #333;
+        min-height: 2.6rem;
+    }
+    
+    .product-price {
+        font-size: 1.8rem;
+        color: #28a745;
+        font-weight: bold;
+        margin: 0.5rem 0;
+    }
+    
+    .product-description {
+        color: #666;
+        font-size: 0.9rem;
+        margin-bottom: 1rem;
+        line-height: 1.5;
+        min-height: 3rem;
+    }
+    
+    .product-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 1rem;
+    }
+    
+    .stock-info {
+        font-size: 0.9rem;
+        color: #666;
+    }
+    
+    .product-link {
+        display: inline-block;
+        padding: 0.7rem 1.5rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        text-decoration: none;
+        border-radius: 25px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .product-link:hover {
+        transform: scale(1.05);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+    
+    .no-products {
+        text-align: center;
+        padding: 3rem;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    }
+    
+    .no-products h2 {
+        font-size: 2rem;
+        color: #666;
+        margin-bottom: 1rem;
+    }
+    
+    .no-products p {
+        color: #999;
+        font-size: 1.1rem;
+    }
+</style>
+
+<div class="shop-header">
+    <h1>🛍️ Shop Our Products</h1>
+    <p style="color: #666; font-size: 1.1rem;">Find exactly what you're looking for</p>
+</div>
+
+<div class="search-section">
+    <form method="get" class="search-form">
+        <input type="text" name="search" placeholder="🔍 Search products..." value="{{ search_query }}" class="search-input">
+        <select name="category" class="category-select">
+            <option value="">All Categories</option>
+            {% for category in categories %}
+            <option value="{{ category.id }}" {% if selected_category == category.id|stringformat:"s" %}selected{% endif %}>
+                {{ category.name }}
+            </option>
+            {% endfor %}
+        </select>
+        <button type="submit" class="search-btn">Search</button>
+    </form>
+</div>
+
+<div class="products-grid">
+    {% for product in products %}
+    <div class="product-card">
+        <div class="product-image" {% if product.image %}style="background-image: url('{{ product.image.url }}'); background-size: cover; background-position: center; font-size: 0;"{% endif %}>
+            {% if not product.image %}
+                {% if 'Laptop' in product.name or 'Smartphone' in product.name or 'Headphones' in product.name %}💻
+                {% elif 'Shirt' in product.name or 'Jeans' in product.name %}👔
+                {% elif 'Book' in product.name or 'Programming' in product.name or 'Novel' in product.name %}📖
+                {% elif 'Garden' in product.name or 'Tools' in product.name %}🌿
+                {% elif 'Basketball' in product.name or 'Yoga' in product.name or 'Mat' in product.name %}🏀
+                {% else %}🎁{% endif %}
+            {% endif %}
+            
+            {% if product.stock_quantity > 20 %}
+                <span class="stock-badge in-stock">In Stock</span>
+            {% elif product.stock_quantity > 0 %}
+                <span class="stock-badge low-stock">Low Stock</span>
+            {% else %}
+                <span class="stock-badge out-of-stock">Out of Stock</span>
+            {% endif %}
+        </div>
+        <div class="product-content">
+            <h3>{{ product.name }}</h3>
+            <div class="product-price">${{ product.price }}</div>
+            <p class="product-description">{{ product.description|truncatewords:20 }}</p>
+            <div class="product-footer">
+                <span class="stock-info">📦 {{ product.stock_quantity }} available</span>
+                <a href="{% url 'product_detail' product.id %}" class="product-link">View →</a>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="no-products" style="grid-column: 1 / -1;">
+        <h2>😕 No products found</h2>
+        <p>Try adjusting your search or browse all categories</p>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
